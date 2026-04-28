@@ -16,9 +16,6 @@ from typing import Tuple, Callable, Iterable, List, Dict, Any, Union
 try:
     import py3nj
 except ImportError:
-    import warnings
-    warnings.warn("`py3nj` package not found! Will use a numerical method to compute the SO(3) Clebsh-Gordan coefficents. This is much slower but the coefficients will be cached on disk.")
-
     py3nj = None
 
 
