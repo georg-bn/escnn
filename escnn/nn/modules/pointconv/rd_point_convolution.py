@@ -20,7 +20,7 @@ try:
     from torch_geometric.nn.conv.message_passing import MessagePassing
 except ImportError:
     # Create a dummy MessagePassing base class to satisfy the Python interpreter
-    class MessagePassing(nn.Module):
+    class MessagePassing(torch.nn.Module):
         def __init__(self, *args, **kwargs):
             super().__init__()
             raise ImportError(
