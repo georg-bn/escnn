@@ -17,6 +17,18 @@ from scipy import linalg, sparse
 import scipy.sparse.linalg as slinalg
 from scipy.sparse import find
 
+try:
+    import pymanopt
+    from pymanopt.manifolds import Euclidean
+    from pymanopt.optimizers import TrustRegions
+
+except ImportError:
+    pymanopt = None
+
+try:
+    import autograd.numpy as anp
+except ImportError:
+    anp = None
 
 try:
     from sklearn.utils.extmath import randomized_svd
@@ -118,7 +130,79 @@ def find_intertwiner_basis_sylvester(rho_1: List[np.ndarray], rho_2: List[np.nda
 
 def find_orthogonal_matrix(basis: np.ndarray, shape, verbose: bool = False) -> np.ndarray:
 
-    raise NotImplementedError("Not implemented in this minimal version of escnn.")
+    # There is a bug in pygmanopt: a ZeroDivisionError is noted but not catched
+    # This seems to happen when the basis contains some matrices like the identity and the anti-diagonal one.
+    # (It is possible other bases cause the same issue, but I have not found out about them yet)
+    # To avoid this error, we catch them before running the method
+
+    if shape[0] == shape[1]:
+        # if the identity matrix belongs to the span of the basis, return that
+        eye = np.eye(*shape).reshape(-1, 1)
+        w_eye = basis.T @ eye
+        if np.allclose(eye, basis@w_eye):
+            return eye.reshape(*shape), 0.
+
+        # if the  anti-diagonal matrix belongs to the span of the basis, return that
+        eye = np.eye(*shape)
+        eye = np.fliplr(eye).reshape(-1, 1)
+
+        w_eye = basis.T @ eye
+        if np.allclose(eye, basis@w_eye):
+            return eye.reshape(*shape), 0.
+
+    if pymanopt is None:
+        raise ImportError("Missing optional 'pymanopt' dependency. Install 'pymanopt' to use this function")
+    
+    if anp is None:
+        raise ImportError("Missing optional 'autograd' dependency. Install 'autograd' to use this function")
+    
+    manifold = Euclidean(basis.shape[1])
+
+    @pymanopt.function.autograd(manifold)
+    def cost(X):
+        d = anp.dot(basis, X).reshape(shape, order='F')
+        if shape[0] < shape[1]:
+            return anp.sum(anp.square(anp.dot(d, d.T) - anp.eye(shape[0])))
+        elif shape[0] > shape[1]:
+            return anp.sum(anp.square(anp.dot(d.T, d) - anp.eye(shape[1])))
+        else:
+            return anp.sum(
+                anp.square(anp.dot(d, d.T) - anp.eye(*shape)) +
+                anp.square(anp.dot(d.T, d) - anp.eye(*shape))
+            )
+    
+    problem = pymanopt.Problem(manifold=manifold, cost=cost)
+    
+    # solver = TrustRegions(use_rand=True, miniter=10, mingradnorm=1e-10)
+    # solver = ParticleSwarm(populationsize=500, maxcostevals=10000, logverbosity=0)
+    # solver = ParticleSwarm(logverbosity=0)
+
+    if not verbose:
+        import os, sys
+        old_stdout = sys.stdout
+        sys.stdout = open(os.devnull, 'w')
+
+    # Xopt = solver.solve(problem)
+    # c = cost(Xopt)
+    # print('PSO, Final Error:', c)
+    #
+    # x = Xopt
+
+    solver = TrustRegions(min_gradient_norm=1e-10, log_verbosity=0)
+
+    Xopt = solver.run(problem)  # , x=x) #, Delta_bar=np.sqrt(basis.shape[1])*2)
+
+    c = Xopt.cost
+
+    if not verbose:
+        sys.stdout = old_stdout  # sys.__stdout__
+    
+    # print('TrustRegions, Final Error:', c)
+    # print('Weights:', Xopt)
+
+    D = np.dot(basis, Xopt.point).reshape(shape, order='F')
+    
+    return D, c
 
 
 def sparse_allclose(A, B, atol=1e-8):
