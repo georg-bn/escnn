@@ -6,8 +6,11 @@ from ._numerical_thomson import thomson_sphere, thomson_so3, thomson_cube_sphere
 
 import warnings
 
-def wigner_D_matrix(l, e0, e1, e2, field):
-    raise NotImplementedError("lie_learn has been purged as a dependency, so this function does not exist.")
+try:
+    from lie_learn.representations.SO3.wigner_d import wigner_D_matrix
+except ImportError:
+    def wigner_D_matrix(l, e0, e1, e2, field):
+        raise NotImplementedError("lie_learn has been purged as a dependency, so this function does not exist.")
 
 
 __all__ = [
