@@ -1,3 +1,4 @@
+This is an attempt at removing some dependencies that I personally do not need. Please use the original repo.
 
 E(n)-equivariant Steerable CNNs (*escnn*)
 --------------------------------------------------------------------------------

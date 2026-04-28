@@ -15,7 +15,18 @@ from typing import Callable, Tuple, Dict, Union
 
 import torch
 
-import torch_geometric
+
+try:
+    from torch_geometric.nn.conv.message_passing import MessagePassing
+except ImportError:
+    # Create a dummy MessagePassing base class to satisfy the Python interpreter
+    class MessagePassing(nn.Module):
+        def __init__(self, *args, **kwargs):
+            super().__init__()
+            raise ImportError(
+                "torch_geometric is required to use Point Convolutions (R2PointConv/R3PointConv). "
+                "Please install it, or use standard pixel-grid convolutions (R2Conv) instead."
+            )
 
 from torch.nn import Parameter
 import numpy as np
@@ -25,7 +36,7 @@ import math
 __all__ = ["_RdPointConv"]
 
 
-class _RdPointConv(torch_geometric.nn.MessagePassing, EquivariantModule, ABC):
+class _RdPointConv(MessagePassing, EquivariantModule, ABC):
     
     def __init__(self,
                  in_type: FieldType,
