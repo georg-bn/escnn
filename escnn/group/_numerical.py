@@ -121,7 +121,7 @@ def find_intertwiner_basis_sylvester(rho_1: List[np.ndarray], rho_2: List[np.nda
         # if len(rho_1) > 10:
         #     basis = null(constraint, True)
         # else:
-        basis = null(constraint.todense(), False, eps=eps)
+        basis = null(np.asarray(constraint.todense()), False, eps=eps)
         
         assert np.allclose(constraint @ basis, 0.)
     
