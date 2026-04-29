@@ -840,7 +840,7 @@ class O3(Group):
         
         return sg_id + (adjoint,)
 
-    def _restrict_irrep(self, irrep: Tuple, id: Tuple) -> Tuple[np.ndarray, List[Tuple]]:
+    def _restrict_irrep(self, irrep: Tuple, id: Tuple) -> Tuple[np.matrix, List[Tuple]]:
         r"""
         Restrict the input irrep of current group to the subgroup identified by "id".
         

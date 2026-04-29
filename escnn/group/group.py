@@ -743,7 +743,7 @@ class Group(ABC):
         return self._homspaces[id]
     
     @abstractmethod
-    def _restrict_irrep(self, irrep: Tuple, id) -> Tuple[np.ndarray, List[Tuple]]:
+    def _restrict_irrep(self, irrep: Tuple, id) -> Tuple[np.matrix, List[Tuple]]:
         pass
 
     def _clebsh_gordan_coeff(self, m, n, j) -> np.ndarray:

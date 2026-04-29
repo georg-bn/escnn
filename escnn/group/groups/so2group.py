@@ -313,7 +313,7 @@ class SO2(Group):
     
         return sg_id2
 
-    def _restrict_irrep(self, irrep: Tuple, id: int) -> Tuple[np.ndarray, List[Tuple]]:
+    def _restrict_irrep(self, irrep: Tuple, id: int) -> Tuple[np.matrix, List[Tuple]]:
         r"""
         
         Restrict the input irrep to the subgroup :math:`C_M` with order "M".
