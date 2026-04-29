@@ -1,6 +1,6 @@
 
 import os
-__cache_path__ = os.path.join(os.path.dirname(__file__), '_cache')
+__cache_path__ = os.environ.get('ESCNN_CACHE_DIR', '/tmp/escnn_cache')
 
 
 from .utils import psi, chi, psichi
