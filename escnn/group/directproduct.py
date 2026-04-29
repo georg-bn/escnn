@@ -575,7 +575,7 @@ class DirectProductGroup(Group):
         
         return self._irreps[id]
 
-    def _restrict_irrep(self, irrep: Tuple, id) -> Tuple[np.matrix, List[Tuple]]:
+    def _restrict_irrep(self, irrep: Tuple, id) -> Tuple[np.ndarray, List[Tuple]]:
 
         # compute the restriction numerically
         # it should be possible to derive the decomposition analitically for the special case in which the subgroup is

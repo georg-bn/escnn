@@ -532,7 +532,7 @@ class SO3(Group):
     
         return sg_id + (adjoint,)
 
-    def _restrict_irrep(self, irrep: Tuple, id) -> Tuple[np.matrix, List[Tuple]]:
+    def _restrict_irrep(self, irrep: Tuple, id) -> Tuple[np.ndarray, List[Tuple]]:
         r"""
         
         Returns:

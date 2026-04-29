@@ -381,7 +381,7 @@ class DihedralGroup(Group):
             flip = sg_id1[0] + inclusion(sg1.element((0, sg_id2[0]))).to('int')[1]
             return (flip,) + sg_id2[1:]
 
-    def _restrict_irrep(self, irrep: Tuple, id: Tuple[int, int]) -> Tuple[np.matrix, List[Tuple]]:
+    def _restrict_irrep(self, irrep: Tuple, id: Tuple[int, int]) -> Tuple[np.ndarray, List[Tuple]]:
         r"""
         Restrict the input irrep of current group :math:`D_{2n}` to the subgroup identified by "id".
         More precisely, "id" is a tuple :math:`(k, m)`, where :math:`m` is a positive integer indicating the number of

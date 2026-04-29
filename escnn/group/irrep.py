@@ -231,7 +231,7 @@ cache = Memory(__cache_path__, verbose=0)
 
 
 @cache.cache
-def _restrict_irrep(irrep_id: Tuple, id, group_class: str, **group_keys) -> Tuple[np.matrix, List[Tuple[Tuple, int]]]:
+def _restrict_irrep(irrep_id: Tuple, id, group_class: str, **group_keys) -> Tuple[np.ndarray, List[Tuple[Tuple, int]]]:
     
     group = escnn.group.groups_dict[group_class]._generator(**group_keys)
     
@@ -277,7 +277,7 @@ def _restrict_irrep(irrep_id: Tuple, id, group_class: str, **group_keys) -> Tupl
     return change_of_basis, irreps
 
 
-def restrict_irrep(irrep: IrreducibleRepresentation, id) -> Tuple[np.matrix, List[Tuple[str, int]]]:
+def restrict_irrep(irrep: IrreducibleRepresentation, id) -> Tuple[np.ndarray, List[Tuple[str, int]]]:
     r"""
         Restrict the input `irrep` to the subgroup identified by `id`.
     """

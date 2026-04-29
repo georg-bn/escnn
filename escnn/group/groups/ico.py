@@ -296,7 +296,7 @@ class Icosahedral(Group):
 
         return sg, parent_map, child_map
 
-    def _restrict_irrep(self, irrep: str, id) -> Tuple[np.matrix, List[str]]:
+    def _restrict_irrep(self, irrep: str, id) -> Tuple[np.ndarray, List[str]]:
         r"""
         
         Returns:
