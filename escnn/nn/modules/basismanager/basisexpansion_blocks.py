@@ -108,18 +108,16 @@ class BlocksBasisExpansion(torch.nn.Module, BasisManager):
     
             # build the indices tensors
             if self._contiguous[io_pair]:
-                # in_indices = torch.LongTensor([
                 in_indices = [
-                    _in_indices[io_pair[0]].min(),
-                    _in_indices[io_pair[0]].max() + 1,
-                    _in_indices[io_pair[0]].max() + 1 - _in_indices[io_pair[0]].min()
-                ]# )
-                # out_indices = torch.LongTensor([
+                    int(_in_indices[io_pair[0]].min()),
+                    int(_in_indices[io_pair[0]].max() + 1),
+                    int(_in_indices[io_pair[0]].max() + 1 - _in_indices[io_pair[0]].min())
+                ]
                 out_indices = [
-                    _out_indices[io_pair[1]].min(),
-                    _out_indices[io_pair[1]].max() + 1,
-                    _out_indices[io_pair[1]].max() + 1 - _out_indices[io_pair[1]].min()
-                ] #)
+                    int(_out_indices[io_pair[1]].min()),
+                    int(_out_indices[io_pair[1]].max() + 1),
+                    int(_out_indices[io_pair[1]].max() + 1 - _out_indices[io_pair[1]].min())
+                ]
                 
                 setattr(self, 'in_indices_{}'.format(self._escape_pair(io_pair)), in_indices)
                 setattr(self, 'out_indices_{}'.format(self._escape_pair(io_pair)), out_indices)
