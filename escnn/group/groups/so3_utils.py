@@ -9,8 +9,95 @@ import warnings
 try:
     from lie_learn.representations.SO3.wigner_d import wigner_D_matrix
 except ImportError:
+    # Vibe-coded version
+    from scipy.special import jacobi
+    import math
+    
+    def wigner_small_d(l, m, n, beta):
+        """Computes the small Wigner d-matrix element."""
+        if not (0 <= l and -l <= m <= l and -l <= n <= l):
+            raise ValueError("Invalid parameters")
+        
+        mu = abs(m - n)
+        nu = abs(m + n)
+        s = l - (mu + nu) / 2.0
+        
+        # Phase factor
+        xi = 1 if n >= m else (-1)**(n - m)
+        
+        # Factorial prefactor
+        num = math.factorial(int(s)) * math.factorial(int(s + mu + nu))
+        den = math.factorial(int(s + mu)) * math.factorial(int(s + nu))
+        sq = np.sqrt(num / den)
+        
+        # SciPy Jacobi polynomial 
+        P = jacobi(int(s), mu, nu)(np.cos(beta))
+        
+        sinb = np.sin(beta / 2.0) ** mu
+        cosb = np.cos(beta / 2.0) ** nu
+        
+        return xi * sq * sinb * cosb * P
+    
+    def wigner_D_complex(l, alpha, beta, gamma):
+        """Computes the standard Complex Wigner D-matrix."""
+        dim = 2 * l + 1
+        D = np.zeros((dim, dim), dtype=complex)
+        indices = range(-l, l + 1)
+        
+        for i, m in enumerate(indices):
+            for j, n in enumerate(indices):
+                d_beta = wigner_small_d(l, m, n, beta)
+                D[i, j] = np.exp(-1j * m * alpha) * d_beta * np.exp(-1j * n * gamma)
+                
+        return D
+    
+    def complex_to_real_transformation(l):
+        """
+        Constructs the unitary transformation matrix U to convert between 
+        complex and real spherical harmonics (centered order, -l to l).
+        Matches standard quantum mechanics Condon-Shortley phase conventions.
+        """
+        dim = 2 * l + 1
+        U = np.zeros((dim, dim), dtype=complex)
+        
+        for i in range(dim):
+            m = i - l # map index back to [-l, l]
+            
+            if m == 0:
+                U[i, i] = 1.0
+            elif m > 0:
+                idx_pos = i
+                idx_neg = l - m
+                U[idx_pos, i] = (-1)**m / np.sqrt(2)
+                U[idx_neg, i] = 1.0 / np.sqrt(2)
+            elif m < 0:
+                pos_m = -m
+                idx_pos = l + pos_m
+                idx_neg = i
+                U[idx_pos, i] = -1j * (-1)**pos_m / np.sqrt(2)
+                U[idx_neg, i] = 1j / np.sqrt(2)
+                
+        return U
+    
+    def wigner_D_real(l, alpha, beta, gamma):
+        """
+        Computes the Real Wigner D-matrix by transforming the complex D-matrix.
+        This mimics the exact approach used by lie_learn's default parameters.
+        """
+        D_c = wigner_D_complex(l, alpha, beta, gamma)
+        U = complex_to_real_transformation(l)
+        
+        # Apply the change of basis: D_real = U^\dagger * D_complex * U
+        U_dagger = np.conj(U).T
+        D_r = U_dagger @ D_c @ U
+        
+        # The result is mathematically real; discard negligible imaginary roundoff
+        return np.real(D_r)
+
     def wigner_D_matrix(l, e0, e1, e2, field):
-        raise NotImplementedError("lie_learn has been purged as a dependency, so this function does not exist.")
+        if field == 'real':
+            return wigner_D_real(l, e0, e1, e2)
+        return NotImplementedError()
 
 
 __all__ = [
