@@ -369,7 +369,8 @@ class Representation:
     def __eq__(self, other: escnn.group.Representation) -> bool:
         if not isinstance(other, Representation):
             return False
-        
+        if self is other:
+            return True
         return (self.name == other.name
                 and self.group == other.group
                 and np.allclose(self.change_of_basis, other.change_of_basis)
